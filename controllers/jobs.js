@@ -1,38 +1,67 @@
-const  {BadRequestError} = require('../errors');
-const getAllJobs = (req, res) => {
-  // Lógica para obtener todos los trabajos aquí
-  res.send("All Jobs");
-};
+const { StatusCodes } = require('http-status-codes')
+const Job = require('../models/Job')
+const { NotFoundError, BadRequestError } = require('../errors')
 
-const getJob = (req, res) => {
-  // Lógica para obtener un trabajo específico aquí
-  const { id } = req.params;
-  if (id == '123') {
-    throw new BadRequestError('ID can not be 123');
+const getAllJobs = async (req, res) => {
+  const { userId } = req.user
+  const jobs = await Job.find({ createdBy: userId }).sort('createdAt')
+  res.status(StatusCodes.OK).json({ count: jobs.length, jobs })
+}
+
+const getJob = async (req, res) => {
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req
+
+  const job = await Job.findOne({ createdBy: userId, _id: jobId })
+
+  if (!job) {
+    throw new NotFoundError('Job not found')
   }
-  res.send(`Single Job`);
-  console.log(`Job ID aqui: ${id}`);
-};
+  res.status(StatusCodes.OK).json({ job })
+}
 
-const createJob = (req, res) => {
-  // Lógica para crear un nuevo trabajo aquí
-  res.send("Create Job");
-};
+const updateJob = async (req, res) => {
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req
 
-const updateJob = (req, res) => {
-  // Lógica para actualizar un trabajo existente aquí
-  res.send("Update Job");
-};
+  const job = await Job.findOneAndUpdate(
+    { createdBy: userId, _id: jobId },
+    req.body,
+    { new: true, runValidators: true }
+  )
 
-const deleteJob = (req, res) => {
-  // Lógica para eliminar un trabajo aquí
-  res.send("Delete Job");
-};
+  if (!job) {
+    throw new NotFoundError('Job not found')
+  }
 
-module.exports = {
-  getAllJobs,
-  getJob,
-  createJob,
-  updateJob,
-  deleteJob,
-};
+  res.status(StatusCodes.OK).json({ job })
+}
+
+const deleteJob = async (req, res) => {
+  const {
+    user: { userId },
+    params: { id: jobId },
+  } = req
+
+  const job = await Job.findOneAndDelete({ createdBy: userId, _id: jobId })
+
+  if (!job) {
+    throw new NotFoundError('Job not found')
+  }
+
+  res.status(StatusCodes.OK).send()
+}
+
+const createJob = async (req, res) => {
+  req.body.createdBy = req.user.userId
+
+  const job = await Job.create(req.body)
+
+  res.status(StatusCodes.CREATED).json({ job })
+}
+
+module.exports = { getAllJobs, getJob, updateJob, deleteJob, createJob }

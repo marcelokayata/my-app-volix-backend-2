@@ -1,29 +1,30 @@
-require("express-async-errors");
-require("dotenv").config();
-const express = require("express");
-const authRouter = require("./routes/auth");
-const jobRouter = require("./routes/jobs");
-const notFound = require("./middlewares/notFound");
-const errorHandler = require("./middlewares/errorHandler")
-const connectDB = require("./db/connect");
-const app = express();
-const port = 3000;
+require('express-async-errors')
+require('dotenv').config()
+const express = require('express')
+const cors = require('cors')
+const notFound = require('./middlewares/notFound')
+const jobRoutes = require('./routes/jobs')
+const authRoutes = require('./routes/auth')
+const connectDB = require('./db/connect')
+const errorHandler = require('./middlewares/errorHandler')
+const authenticate = require('./middlewares/authenticate')
 
-app.use(express.json());
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/jobs", jobRouter);
-app.use(notFound);
-app.use(errorHandler);
+const app = express()
+
+app.use(cors())
+app.use(express.json())
+app.use('/api/v1/jobs', authenticate, jobRoutes)
+app.use('/api/v1/auth', authRoutes)
+app.use(notFound)
+app.use(errorHandler)
 
 const start = async () => {
   try {
-    await connectDB(process.env.MONGO_URI);
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    await connectDB(process.env.MONGO_URI)
+    app.listen(3000, () => console.log('Server started...'))
+  } catch (err) {
+    console.log(err)
   }
 }
 
-start();
+start()
