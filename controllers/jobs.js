@@ -1,4 +1,4 @@
-const  {BadRequestError, CustomAPIError} = require('../errors');
+const  {BadRequestError} = require('../errors');
 const getAllJobs = (req, res) => {
   // Lógica para obtener todos los trabajos aquí
   res.send("All Jobs");
@@ -8,8 +8,7 @@ const getJob = (req, res) => {
   // Lógica para obtener un trabajo específico aquí
   const { id } = req.params;
   if (id == '123') {
-    // throw new BadRequestError('ID can not be 123');
-    throw new CustomAPIError('ID can not be 123');
+    throw new BadRequestError('ID can not be 123');
   }
   res.send(`Single Job`);
   console.log(`Job ID aqui: ${id}`);
