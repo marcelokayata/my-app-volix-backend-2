@@ -1,8 +1,8 @@
-const mogoose = require("mongoose");
+const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const UserSchema = new mogoose.Schema({
+const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please provide name"],
@@ -36,6 +36,6 @@ UserSchema.methods.createToken = function () {
   });
 }
 
-const User = mogoose.model("User", UserSchema);
+const User = mongoose.model("User", UserSchema);
 
 module.exports = User;
