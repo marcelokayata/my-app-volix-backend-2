@@ -13,7 +13,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
-app.use('/api/v1/jobs', authenticate, jobRoutes)
+app.use('/api/v1/jobs', authenticate, jobRoutes) // O authenticate protege o jobROutes
 app.use('/api/v1/auth', authRoutes)
 app.use(notFound)
 app.use(errorHandler)
