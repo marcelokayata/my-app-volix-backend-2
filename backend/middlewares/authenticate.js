@@ -8,7 +8,7 @@ const authenticate = (req, res, next) => {
     throw new UnauthenticatedError('Authentication Failed')
   }
 
-  const token = authHeader.split(' ')[1]
+  const token = authHeader.split(' ')[1] // esse 1 é o token, o 0 é o Bearer
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
